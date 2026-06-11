@@ -1222,7 +1222,7 @@ const WEATHER_KEY = '8812229d64bef4766b2b327d2fda7b95de6f4dcfb04b47c3dcab597e415
 
 async function autoLoadSheets() {
   try {
-    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEETS_ID}/values/시트1!A2:H200?key=${SHEETS_KEY}`);
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEETS_ID}/values/Sheet1!A2:H200?key=${SHEETS_KEY}`);
     const json = await res.json();
     const rows = json.values || [];
     if (rows.length) {
