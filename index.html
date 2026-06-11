@@ -1222,9 +1222,36 @@ function delProd(id){
   if(confirm('삭제할까요?')){products=products.filter(p=>p.id!==id);renderAdmin();}
 }
 
+/* ── AUTO LOAD ── */
+const SHEETS_ID = '1cNy76QiK5bqIfP-DDnvHcvMe3RK2TQ9tIb5sB7RmHvw';
+const SHEETS_KEY = 'AIzaSyD1U9kc7RunPUtMbLmZRHBm1yOIFf_Mbj8';
+const WEATHER_KEY = '8812229d64bef4766b2b327d2fda7b95de6f4dcfb04b47c3dcab597e415f46a7';
+
+async function autoLoadSheets() {
+  try {
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEETS_ID}/values/시트1!A2:H200?key=${SHEETS_KEY}`);
+    const json = await res.json();
+    const rows = json.values || [];
+    if (rows.length) {
+      products = rows.map((r,i) => ({
+        id:i+1, name:r[0]||'', cat:r[1]||'기타', price:r[2]||'0',
+        copy:r[3]||'', url:r[4]||'#', weather:r[5]||'',
+        img:r[6]||null, style:r[7]||'', icon:ICONS[r[1]]||'👔'
+      })).filter(p=>p.name);
+    }
+  } catch(e) { console.log('시트 로드 실패', e); }
+}
+
+async function autoLoadWeather() {
+  const el = document.getElementById('w-key');
+  if (el) el.value = WEATHER_KEY;
+  await fetchWeather();
+}
+
 /* ── INIT ── */
 renderWd();
-fetchWeather();
+autoLoadWeather();
+autoLoadSheets();
 </script>
 </body>
 </html>
