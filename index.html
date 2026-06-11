@@ -2,424 +2,873 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="description" content="MAYBLUE — 오늘 날씨와 장소에 맞는 AI 코디 추천">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta property="og:title" content="MAYBLUE 코디 추천">
 <meta property="og:description" content="날씨·장소·스타일 취향 기반 AI 코디 추천">
 <meta property="og:type" content="website">
 <title>MAYBLUE — AI 코디 추천</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 :root{
-  --bg:#ffffff;--bg2:#f8f8f8;--bg3:#f2f2f2;--bg4:#ebebeb;
+  --bg:#ffffff;--bg2:#f8f6f3;--bg3:#f1ede8;--bg4:#e8e2db;
   --br:#8b6f4e;--br2:#6b5240;--br3:#4a3728;
   --tx:#1a1a1a;--tx2:#666;--tx3:#999;--tx4:#ccc;
-  --bd:#e8e8e8;--bd2:#d8d8d8;
-  --acc:#6b5240;--acc-bg:#f5f0ec;
-  --r:10px;--rs:7px;
-  --max:480px;
+  --bd:#e8e4df;--bd2:#d8d2cc;
+  --acc:#6b5240;--acc-bg:#f5f0eb;
+  --r:12px;--rs:8px;
+  --max:430px;
+  --tabh:60px;
+  --navh:52px;
 }
-html,body{height:100%;background:#f0ede8}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;color:var(--tx);display:flex;justify-content:center;align-items:flex-start;min-height:100vh}
-.app-shell{width:100%;max-width:var(--max);background:#fff;min-height:100vh;position:relative;box-shadow:0 0 40px rgba(0,0,0,.1)}
-@media(min-width:500px){.app-shell{margin:0 auto;min-height:100vh}}
 
-.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#fff;border-bottom:0.5px solid var(--bd);position:sticky;top:0;z-index:100}
-.logo{font-size:13px;font-weight:500;letter-spacing:.22em;color:var(--br2)}
-.ntabs{display:flex;gap:1px;background:var(--bg3);border-radius:20px;padding:3px}
-.ntab{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:none;color:var(--tx2);background:none;transition:all .15s;white-space:nowrap}
-.ntab.on{background:#fff;color:var(--br2);box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.pg{display:none}.pg.on{display:block}
+html{height:100%;background:#e8e4df}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR','Apple SD Gothic Neo',sans-serif;
+  color:var(--tx);
+  display:flex;
+  justify-content:center;
+  min-height:100vh;
+  background:#e8e4df;
+}
+.app-shell{
+  width:100%;
+  max-width:var(--max);
+  background:#fff;
+  min-height:100vh;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  box-shadow:0 0 60px rgba(0,0,0,.12);
+  overflow:hidden;
+}
 
-.wbar{padding:11px 20px;background:var(--bg2);border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
-.wleft{display:flex;align-items:center;gap:10px}
-.wico{font-size:24px}
-.wtemp{font-size:20px;font-weight:500;color:var(--tx)}
-.wdesc{font-size:11px;color:var(--tx2);margin-top:2px}
-.wgps{font-size:10px;color:var(--tx3);margin-top:2px}
-.wtags{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
-.wtag{padding:3px 9px;border-radius:20px;font-size:11px;background:#fff;color:var(--tx2);border:0.5px solid var(--bd)}
+/* ─── TOP NAV ─── */
+.nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;
+  height:var(--navh);
+  background:#fff;
+  border-bottom:0.5px solid var(--bd);
+  position:sticky;top:0;z-index:100;
+  flex-shrink:0;
+}
+.logo{
+  font-size:14px;font-weight:600;
+  letter-spacing:.28em;color:var(--br2);
+}
+.logo span{font-weight:300;letter-spacing:.22em;color:var(--tx3)}
+.weather-pill{
+  display:flex;align-items:center;gap:5px;
+  padding:5px 11px;
+  border-radius:20px;
+  background:var(--bg2);
+  border:0.5px solid var(--bd);
+  cursor:default;
+}
+.w-ico{font-size:15px;line-height:1}
+.w-right{}
+.w-temp{font-size:13px;font-weight:500;color:var(--tx);line-height:1.1}
+.w-sub{font-size:10px;color:var(--tx3);line-height:1.2}
 
-.big-tabs{display:grid;grid-template-columns:3fr 2fr;border-bottom:0.5px solid var(--bd);background:#fff}
-.btab{padding:13px 8px;text-align:center;cursor:pointer;border:none;background:none;font-size:11px;font-weight:500;color:var(--tx2);transition:all .15s;border-bottom:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:4px}
-.btab .bico{font-size:18px}
-.btab.on{color:var(--br2);border-bottom-color:var(--br2)}
-.btab:hover:not(.on){background:var(--bg2)}
+/* ─── PAGE WRAPPER ─── */
+.pages{flex:1;overflow:hidden;position:relative}
+.pg{display:none;height:calc(100vh - var(--navh) - var(--tabh));overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pg.on{display:block}
 
-.panel-inner{padding:12px 20px;background:var(--bg2);border-bottom:0.5px solid var(--bd)}
-.sec{padding:12px 20px}
-.sec-lbl{font-size:11px;color:var(--tx2);font-weight:500;letter-spacing:.03em;margin-bottom:7px}
+/* ─── BOTTOM TAB BAR ─── */
+.tabbar{
+  height:var(--tabh);
+  display:flex;
+  border-top:0.5px solid var(--bd);
+  background:#fff;
+  position:sticky;bottom:0;z-index:100;
+  flex-shrink:0;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tab{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  cursor:pointer;border:none;background:none;
+  color:var(--tx3);
+  transition:color .15s;
+  -webkit-tap-highlight-color:transparent;
+  padding-bottom:2px;
+}
+.tab.on{color:var(--br2)}
+.tab-ico{font-size:20px;line-height:1}
+.tab-lbl{font-size:10px;font-weight:500;letter-spacing:.02em}
+
+/* ─── WEATHER DETAIL BAR ─── */
+.wdetail{
+  padding:10px 16px;
+  background:var(--bg2);
+  border-bottom:0.5px solid var(--bd);
+  display:flex;gap:7px;flex-wrap:wrap;
+  align-items:center;
+}
+.wtag{
+  padding:4px 10px;border-radius:20px;
+  font-size:11px;
+  background:#fff;color:var(--tx2);
+  border:0.5px solid var(--bd);
+}
+.wgps{font-size:10px;color:var(--tx3);margin-left:auto}
+
+/* ─── MODE TABS ─── */
+.mode-tabs{
+  display:grid;grid-template-columns:1fr 1fr;
+  border-bottom:0.5px solid var(--bd);
+  background:#fff;
+  margin-bottom:0;
+}
+.mtab{
+  padding:12px 8px;text-align:center;cursor:pointer;
+  border:none;background:none;
+  font-size:12px;font-weight:500;color:var(--tx3);
+  transition:all .15s;
+  border-bottom:2px solid transparent;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  -webkit-tap-highlight-color:transparent;
+}
+.mtab .mico{font-size:17px}
+.mtab.on{color:var(--br2);border-bottom-color:var(--br2);background:linear-gradient(to bottom,#fff,var(--bg2))}
+
+/* ─── INNER PANEL (옷장 힌트) ─── */
+.panel-hint{
+  padding:10px 16px;
+  background:var(--acc-bg);
+  border-bottom:0.5px solid var(--bd);
+  font-size:12px;color:var(--tx2);
+  display:none;
+}
+.panel-hint.on{display:block}
+
+/* ─── FORM SECTIONS ─── */
+.sec{padding:14px 16px}
+.sec + .sec{padding-top:0}
+.sec-lbl{font-size:11px;color:var(--tx2);font-weight:600;letter-spacing:.05em;margin-bottom:8px;text-transform:uppercase}
 .divider{height:0.5px;background:var(--bd)}
+.divider-thick{height:6px;background:var(--bg3)}
 
 .loc-time-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
 .inp-wrap{display:flex;flex-direction:column;gap:4px}
 .inp-lbl{font-size:11px;color:var(--tx2);font-weight:500}
-.inp{width:100%;background:#fff;border:0.5px solid var(--bd2);border-radius:var(--rs);padding:8px 11px;color:var(--tx);font-size:13px;transition:border .15s;-webkit-appearance:none}
-.inp:focus{outline:none;border-color:var(--br)}
+.inp{
+  width:100%;
+  background:#fff;border:0.5px solid var(--bd2);
+  border-radius:var(--rs);
+  padding:10px 12px;
+  color:var(--tx);font-size:14px;
+  transition:border .15s,box-shadow .15s;
+  -webkit-appearance:none;
+}
+.inp:focus{outline:none;border-color:var(--br);box-shadow:0 0 0 3px rgba(107,82,64,.08)}
 .inp::placeholder{color:var(--tx4)}
 
-.mood-area{padding:9px 20px;background:#fff;border-bottom:0.5px solid var(--bd);display:none;align-items:center;justify-content:space-between}
-.mood-area.on{display:flex}
-.mood-l{display:flex;align-items:center;gap:7px}
-.mood-ico{font-size:16px}
-.mood-nm{font-size:12px;font-weight:500;color:var(--tx)}
+/* ─── MOOD REVEAL ─── */
+.mood-strip{
+  display:none;
+  margin:0 16px 10px;
+  padding:10px 14px;
+  border-radius:var(--r);
+  background:var(--acc-bg);
+  border:0.5px solid var(--bd2);
+  align-items:center;justify-content:space-between;
+  gap:10px;
+}
+.mood-strip.on{display:flex}
+.mood-l{display:flex;align-items:center;gap:8px}
+.mood-ico{font-size:18px}
+.mood-nm{font-size:13px;font-weight:500;color:var(--tx)}
 .mood-ds{font-size:11px;color:var(--tx2);margin-top:1px}
-.mood-badge{padding:3px 9px;border-radius:20px;font-size:11px;background:var(--acc-bg);color:var(--br2);border:0.5px solid #ddd5cc;white-space:nowrap}
+.mood-badge{
+  padding:4px 10px;border-radius:20px;
+  font-size:11px;
+  background:#fff;color:var(--br2);
+  border:0.5px solid var(--bd2);
+  white-space:nowrap;flex-shrink:0;
+}
 
-.chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
-.chip{padding:7px 12px;border-radius:20px;font-size:12px;border:0.5px solid var(--bd2);color:var(--tx2);cursor:pointer;background:#fff;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.chip.on{border-color:var(--br);color:var(--br2);background:var(--acc-bg)}
-.sinput{width:100%;background:#fff;border:0.5px solid var(--bd2);border-radius:var(--rs);padding:8px 11px;color:var(--tx);font-size:13px;resize:none;height:52px;-webkit-appearance:none}
+/* ─── CHIPS ─── */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.chip{
+  padding:7px 14px;border-radius:20px;
+  font-size:13px;
+  border:0.5px solid var(--bd2);
+  color:var(--tx2);cursor:pointer;
+  background:#fff;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.chip.on{border-color:var(--br);color:var(--br2);background:var(--acc-bg);font-weight:500}
+.chip:active{transform:scale(.97)}
+
+/* ─── STYLE CHIPS ─── */
+.schips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.schip{
+  padding:7px 14px;border-radius:20px;
+  font-size:13px;
+  border:0.5px solid var(--bd2);
+  color:var(--tx2);cursor:pointer;
+  background:#fff;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.schip.on{border-color:var(--br);color:var(--br2);background:var(--acc-bg);font-weight:500}
+.schip:active{transform:scale(.97)}
+
+/* ─── TEXTAREA ─── */
+.sinput{
+  width:100%;background:#fff;
+  border:0.5px solid var(--bd2);
+  border-radius:var(--rs);
+  padding:10px 12px;
+  color:var(--tx);font-size:13px;
+  resize:none;height:54px;
+  -webkit-appearance:none;
+  transition:border .15s;
+  font-family:inherit;
+}
 .sinput::placeholder{color:var(--tx4)}
 .sinput:focus{outline:none;border-color:var(--br)}
 
-.style-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
-.schip{padding:7px 12px;border-radius:20px;font-size:12px;border:0.5px solid var(--bd2);color:var(--tx2);cursor:pointer;background:#fff;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.schip.on{border-color:var(--br);color:var(--br2);background:var(--acc-bg)}
-.custom-row{display:flex;align-items:center;gap:7px}
+/* ─── CUSTOM STYLE INPUT ─── */
+.custom-row{display:flex;align-items:center;gap:8px}
 .custom-chk{width:16px;height:16px;accent-color:var(--br2);cursor:pointer;flex-shrink:0}
-.custom-inp{flex:1;background:#fff;border:0.5px solid var(--bd2);border-radius:var(--rs);padding:7px 10px;color:var(--tx);font-size:13px}
+.custom-inp{
+  flex:1;background:#fff;
+  border:0.5px solid var(--bd2);border-radius:var(--rs);
+  padding:8px 11px;color:var(--tx);font-size:13px;
+  font-family:inherit;
+}
 .custom-inp:focus{outline:none;border-color:var(--br)}
 .custom-inp::placeholder{color:var(--tx4)}
-.custom-inp:disabled{background:var(--bg3);color:var(--tx3)}
+.custom-inp:disabled{background:var(--bg3);color:var(--tx4)}
 
-.upbox{border:0.5px dashed var(--bd2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;background:#fff;transition:all .15s}
-.upbox:hover{border-color:var(--br);background:var(--acc-bg)}
-.upbox .uico{font-size:22px;margin-bottom:6px}
-.upbox .ulbl{font-size:13px;color:var(--tx2)}
-.upbox .usub{font-size:11px;color:var(--tx3);margin-top:3px}
-#face-prev{width:100%;height:140px;object-fit:cover;border-radius:var(--rs);display:none;margin-top:8px}
-
-.cta-wrap{padding:10px 20px 16px}
-.ctabtn{width:100%;padding:15px;background:var(--br2);border:none;border-radius:var(--r);color:#fff;font-size:14px;font-weight:500;cursor:pointer;letter-spacing:.04em;transition:all .15s;-webkit-tap-highlight-color:transparent}
+/* ─── CTA BUTTON ─── */
+.cta-wrap{padding:12px 16px 16px}
+.ctabtn{
+  width:100%;padding:16px;
+  background:var(--br2);border:none;
+  border-radius:var(--r);
+  color:#fff;font-size:14px;font-weight:600;
+  cursor:pointer;letter-spacing:.04em;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+  font-family:inherit;
+}
 .ctabtn:hover{background:var(--br3)}
 .ctabtn:active{transform:scale(.99)}
-.ctabtn:disabled{background:var(--tx3);cursor:not-allowed}
+.ctabtn:disabled{background:var(--tx4);cursor:not-allowed;transform:none}
 
-.loading{padding:32px 20px;text-align:center;display:none}
+/* ─── LOADING ─── */
+.loading{padding:40px 20px;text-align:center;display:none}
 .loading.on{display:block}
-.spinner{width:24px;height:24px;border:1.5px solid var(--bd2);border-top-color:var(--br);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+.spinner{
+  width:26px;height:26px;
+  border:2px solid var(--bd2);border-top-color:var(--br);
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  margin:0 auto 14px;
+}
 @keyframes spin{to{transform:rotate(360deg)}}
+.ltxt{font-size:13px;color:var(--tx2)}
 
-.result{padding:0 20px 20px;display:none}
+/* ─── RESULT ─── */
+.result{padding:0 16px 20px;display:none}
 .result.on{display:block}
-.rhd{font-size:11px;color:var(--tx3);font-weight:500;letter-spacing:.07em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.rhd{
+  font-size:10px;color:var(--tx3);font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
 .rhd::after{content:'';flex:1;height:0.5px;background:var(--bd)}
-.ocard{background:#fff;border:0.5px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:10px}
-.otitle{font-size:15px;font-weight:500;color:var(--tx);margin-bottom:5px}
-.odesc{font-size:13px;color:var(--tx2);line-height:1.65;margin-bottom:14px;white-space:pre-line}
-.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.pcard{background:var(--bg2);border:0.5px solid var(--bd);border-radius:var(--rs);overflow:hidden;cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent}
-.pcard:active{transform:scale(.98)}
-.pimg{width:100%;height:90px;display:flex;align-items:center;justify-content:center;background:var(--bg3);font-size:28px;overflow:hidden}
-.pimg img{width:100%;height:100%;object-fit:cover}
-.pbody{padding:9px 10px 11px}
-.pbadge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;background:var(--acc-bg);color:var(--br2);border:0.5px solid #ddd5cc;margin-bottom:4px}
-.pname{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:3px}
-.pcopy{font-size:11px;color:var(--tx2);line-height:1.5;margin-bottom:6px}
-.pfoot{display:flex;align-items:center;justify-content:space-between}
-.pprice{font-size:13px;font-weight:500;color:var(--br2)}
-.plink{font-size:11px;color:var(--tx3)}
+.ocard{
+  background:#fff;
+  border:0.5px solid var(--bd);
+  border-radius:var(--r);
+  padding:16px;margin-bottom:12px;
+  box-shadow:0 1px 8px rgba(0,0,0,.04);
+}
+.otitle{font-size:16px;font-weight:600;color:var(--tx);margin-bottom:6px}
+.odesc{font-size:13px;color:var(--tx2);line-height:1.7;white-space:pre-line}
 
-.share-row{display:flex;gap:7px;margin-top:10px}
-.sbtn{flex:1;padding:11px 6px;border-radius:var(--rs);font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid var(--bd2);background:#fff;color:var(--tx2);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;-webkit-tap-highlight-color:transparent}
-.sbtn:active{transform:scale(.98)}
+/* ─── PRODUCT GRID ─── */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.pcard{
+  background:var(--bg2);
+  border:0.5px solid var(--bd);
+  border-radius:var(--rs);
+  overflow:hidden;cursor:pointer;
+  transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.pcard:active{transform:scale(.98);opacity:.9}
+.pimg{
+  width:100%;height:100px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg3);font-size:30px;overflow:hidden;
+}
+.pimg img{width:100%;height:100%;object-fit:cover}
+.pbody{padding:10px 10px 12px}
+.pbadge{
+  display:inline-block;padding:2px 8px;
+  border-radius:20px;font-size:10px;
+  background:var(--acc-bg);color:var(--br2);
+  border:0.5px solid var(--bd2);
+  margin-bottom:5px;
+}
+.pname{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:3px;line-height:1.4}
+.pcopy{font-size:11px;color:var(--tx2);line-height:1.5;margin-bottom:7px}
+.pfoot{display:flex;align-items:center;justify-content:space-between}
+.pprice{font-size:13px;font-weight:600;color:var(--br2)}
+.plink{font-size:10px;color:var(--tx3)}
+
+/* ─── SHARE ─── */
+.share-row{display:flex;gap:7px;margin-top:4px}
+.sbtn{
+  flex:1;padding:11px 6px;
+  border-radius:var(--rs);
+  font-size:12px;font-weight:500;
+  cursor:pointer;
+  border:0.5px solid var(--bd2);
+  background:#fff;color:var(--tx2);
+  transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  -webkit-tap-highlight-color:transparent;
+  font-family:inherit;
+}
+.sbtn:active{transform:scale(.97)}
 .s-kako{background:#FEE500;color:#3C1E1E;border-color:#e6ce00}
 
-.wd-hd{padding:14px 20px 10px;background:#fff;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
-.addbtn{padding:7px 14px;border-radius:20px;font-size:12px;background:var(--bg2);border:0.5px solid var(--bd2);color:var(--br2);cursor:pointer;display:flex;align-items:center;gap:4px;-webkit-tap-highlight-color:transparent}
-.cattabs{padding:8px 20px 0;display:flex;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* ─── FACE UPLOAD (OPTIONAL) ─── */
+.face-sec{
+  margin:0 16px 14px;
+  border:0.5px dashed var(--bd2);
+  border-radius:var(--r);
+  padding:14px;
+  background:#fff;
+  display:flex;align-items:center;gap:12px;
+}
+.face-left{flex:1;min-width:0}
+.face-lbl{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:3px}
+.face-sub{font-size:11px;color:var(--tx3);line-height:1.5}
+.face-btn{
+  flex-shrink:0;
+  padding:7px 14px;border-radius:20px;
+  border:0.5px solid var(--bd2);
+  background:var(--bg2);color:var(--tx2);
+  font-size:12px;cursor:pointer;
+  white-space:nowrap;
+  font-family:inherit;
+}
+.face-preview{
+  width:56px;height:56px;
+  object-fit:cover;
+  border-radius:var(--rs);
+  display:none;flex-shrink:0;
+  border:0.5px solid var(--bd);
+}
+
+/* ─── WARDROBE PAGE ─── */
+.wd-hd{
+  padding:14px 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:0.5px solid var(--bd);
+}
+.wd-title{font-size:15px;font-weight:600}
+.addbtn{
+  padding:7px 14px;border-radius:20px;
+  font-size:12px;font-weight:500;
+  background:var(--br2);border:none;
+  color:#fff;cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+  -webkit-tap-highlight-color:transparent;
+  font-family:inherit;
+}
+.addbtn:active{opacity:.8}
+.cattabs{
+  padding:8px 16px 0;
+  display:flex;gap:6px;
+  overflow-x:auto;-webkit-overflow-scrolling:touch;
+  border-bottom:0.5px solid var(--bd);
+  padding-bottom:10px;
+}
 .cattabs::-webkit-scrollbar{display:none}
-.ctab{padding:5px 13px;border-radius:20px;font-size:12px;white-space:nowrap;border:0.5px solid var(--bd2);color:var(--tx2);cursor:pointer;background:#fff;flex-shrink:0;transition:all .15s}
+.ctab{
+  padding:5px 14px;border-radius:20px;
+  font-size:12px;white-space:nowrap;
+  border:0.5px solid var(--bd2);
+  color:var(--tx2);cursor:pointer;
+  background:#fff;flex-shrink:0;
+  transition:all .15s;
+  font-family:inherit;
+}
 .ctab.on{background:var(--acc-bg);color:var(--br2);border-color:var(--br)}
-.wdgrid{padding:10px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.wdi{aspect-ratio:3/4;background:#fff;border:0.5px solid var(--bd);border-radius:var(--rs);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;position:relative;overflow:hidden;transition:all .15s}
-.wdi.add{border-style:dashed;border-color:var(--bd2)}
+.wdgrid{
+  padding:12px 16px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+}
+.wdi{
+  aspect-ratio:3/4;background:#fff;
+  border:0.5px solid var(--bd);
+  border-radius:var(--rs);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:4px;cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:all .15s;
+}
+.wdi.add{border-style:dashed;border-color:var(--bd2);color:var(--tx3);font-size:22px}
 .wdi img{width:100%;height:100%;object-fit:cover}
 .wdlbl{font-size:10px;color:var(--tx3)}
-.iov{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.45);padding:5px}
+.iov{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(0,0,0,.42);padding:5px 6px;
+}
 .inm{font-size:9px;color:#fff;text-align:center}
+.wd-cta{padding:0 16px 24px}
 
-/* admin lock */
-.lock-screen{padding:50px 30px;text-align:center}
-.lock-ico{font-size:40px;margin-bottom:16px}
-.lock-title{font-size:16px;font-weight:500;margin-bottom:6px}
-.lock-sub{font-size:13px;color:var(--tx2);margin-bottom:24px}
-.lock-inp{width:100%;max-width:260px;background:var(--bg2);border:0.5px solid var(--bd2);border-radius:var(--rs);padding:12px 14px;color:var(--tx);font-size:14px;letter-spacing:.08em;text-align:center;-webkit-appearance:none;display:block;margin:0 auto 10px}
+/* ─── EMPTY STATE ─── */
+.empty-wd{
+  padding:50px 30px;
+  text-align:center;
+  color:var(--tx3);
+}
+.empty-ico{font-size:36px;margin-bottom:12px}
+.empty-txt{font-size:13px;line-height:1.7}
+
+/* ─── ADMIN PAGE ─── */
+.lock-screen{padding:60px 30px;text-align:center}
+.lock-ico{font-size:40px;margin-bottom:18px}
+.lock-title{font-size:17px;font-weight:600;margin-bottom:6px}
+.lock-sub{font-size:13px;color:var(--tx2);margin-bottom:28px;line-height:1.6}
+.lock-inp{
+  width:100%;max-width:260px;
+  background:var(--bg2);border:0.5px solid var(--bd2);
+  border-radius:var(--rs);
+  padding:13px 16px;
+  color:var(--tx);font-size:15px;
+  letter-spacing:.1em;text-align:center;
+  -webkit-appearance:none;
+  display:block;margin:0 auto 12px;
+  font-family:inherit;
+}
 .lock-inp:focus{outline:none;border-color:var(--br)}
-.lock-btn{display:block;width:100%;max-width:260px;margin:0 auto;padding:12px;background:var(--br2);border:none;border-radius:var(--rs);color:#fff;font-size:13px;font-weight:500;cursor:pointer}
+.lock-btn{
+  display:block;width:100%;max-width:260px;
+  margin:0 auto;
+  padding:13px;
+  background:var(--br2);border:none;
+  border-radius:var(--rs);
+  color:#fff;font-size:14px;font-weight:600;
+  cursor:pointer;font-family:inherit;
+}
 .lock-err{font-size:12px;color:#c0392b;margin-top:10px;min-height:18px;text-align:center}
 .admin-content{display:none}
 .admin-content.on{display:block}
 
-.admin-sec{padding:14px 20px}
-.ahd{font-size:11px;color:var(--tx2);font-weight:500;letter-spacing:.06em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.logout-row{padding:12px 16px 0;display:flex;justify-content:flex-end}
+.logout-btn{
+  padding:6px 13px;border-radius:20px;
+  font-size:11px;
+  border:0.5px solid var(--bd2);
+  color:var(--tx2);background:none;cursor:pointer;
+  font-family:inherit;
+}
+.admin-sec{padding:14px 16px}
+.ahd{
+  font-size:10px;color:var(--tx2);font-weight:600;
+  letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:10px;
+}
 .ahd::after{content:'';flex:1;height:0.5px;background:var(--bd)}
-.note-box{border-radius:var(--rs);padding:11px 13px;font-size:12px;margin-bottom:10px;border:0.5px solid;line-height:1.7}
+
+/* Note boxes */
+.note-box{
+  border-radius:var(--rs);padding:12px 14px;
+  font-size:12px;margin-bottom:12px;
+  border:0.5px solid;line-height:1.7;
+}
 .note-green{background:#f2f8f4;color:#1a5c36;border-color:#b8dcc6}
 .note-blue{background:#f0f5fb;color:#1a3a5c;border-color:#b0ccee}
 .note-box a{color:inherit;text-decoration:underline}
-.note-box strong{font-weight:500}
-.note-step{display:flex;gap:8px;margin-top:7px;align-items:flex-start}
-.note-num{width:19px;height:19px;border-radius:50%;background:rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;margin-top:1px;border:0.5px solid rgba(0,0,0,.1)}
-.fi{width:100%;background:var(--bg2);border:0.5px solid var(--bd2);border-radius:var(--rs);padding:8px 12px;color:var(--tx);font-size:13px;margin-bottom:8px;-webkit-appearance:none}
+.note-box strong{font-weight:600}
+.note-step{display:flex;gap:8px;margin-top:8px;align-items:flex-start}
+.note-num{
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(255,255,255,.8);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:600;flex-shrink:0;margin-top:1px;
+  border:0.5px solid rgba(0,0,0,.1);
+}
+.st-cols{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.st-col{
+  padding:3px 8px;border-radius:5px;
+  background:#fff;font-size:10px;
+  color:#1a5c36;border:0.5px solid #b8dcc6;
+}
+
+/* Admin form fields */
+.fi{
+  width:100%;background:#fff;
+  border:0.5px solid var(--bd2);
+  border-radius:var(--rs);
+  padding:10px 13px;color:var(--tx);
+  font-size:13px;margin-bottom:8px;
+  -webkit-appearance:none;font-family:inherit;
+}
 .fi:focus{outline:none;border-color:var(--br)}
-.fl{font-size:11px;color:var(--tx2);margin-bottom:4px;display:block}
+.fl{font-size:11px;color:var(--tx2);margin-bottom:4px;display:block;font-weight:500}
 .fr2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.fsave{background:var(--br2);border:none;border-radius:var(--rs);color:#fff;font-size:13px;font-weight:500;padding:10px;width:100%;cursor:pointer;margin-bottom:14px}
-.pli{display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border-radius:var(--rs);margin-bottom:5px;border:0.5px solid var(--bd)}
-.pli-img{width:40px;height:40px;border-radius:var(--rs);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;overflow:hidden}
+.fsave{
+  background:var(--br2);border:none;
+  border-radius:var(--rs);
+  color:#fff;font-size:13px;font-weight:600;
+  padding:11px;width:100%;cursor:pointer;
+  margin-bottom:14px;font-family:inherit;
+}
+.fsave:active{opacity:.85}
+
+/* Product list in admin */
+.pli{
+  display:flex;align-items:center;gap:10px;
+  padding:10px;background:#fff;
+  border-radius:var(--rs);margin-bottom:6px;
+  border:0.5px solid var(--bd);
+}
+.pli-img{
+  width:42px;height:42px;border-radius:var(--rs);
+  background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;overflow:hidden;
+}
 .pli-img img{width:100%;height:100%;object-fit:cover}
 .pli-info{flex:1;min-width:0}
 .pli-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pli-meta{font-size:11px;color:var(--tx2)}
-.actbtn{padding:4px 10px;border-radius:6px;font-size:11px;border:0.5px solid var(--bd2);color:var(--tx2);cursor:pointer;background:none}
-.addform{background:var(--bg2);border:0.5px solid var(--bd);border-radius:var(--r);padding:14px;margin-top:8px;display:none}
+.actbtn{
+  padding:5px 11px;border-radius:6px;
+  font-size:11px;border:0.5px solid var(--bd2);
+  color:var(--tx2);cursor:pointer;background:none;
+  font-family:inherit;
+}
+
+/* Add form */
+.addform{
+  background:var(--bg2);border:0.5px solid var(--bd);
+  border-radius:var(--r);
+  padding:14px;margin-top:8px;display:none;
+}
 .addform.on{display:block}
-.img-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.img-thumb{width:40px;height:40px;border-radius:var(--rs);background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden;flex-shrink:0;border:0.5px solid var(--bd)}
+.img-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.img-thumb{
+  width:44px;height:44px;border-radius:var(--rs);
+  background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;overflow:hidden;flex-shrink:0;
+  border:0.5px solid var(--bd);
+}
 .img-thumb img{width:100%;height:100%;object-fit:cover}
-.img-upbtn{flex:1;padding:8px 12px;border:0.5px dashed var(--bd2);border-radius:var(--rs);font-size:12px;color:var(--tx2);cursor:pointer;text-align:center;background:#fff}
-.st-cols{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
-.st-col{padding:3px 8px;border-radius:5px;background:#fff;font-size:10px;color:#1a5c36;border:0.5px solid #b8dcc6}
-.logout-row{padding:10px 20px 0;display:flex;justify-content:flex-end}
-.logout-btn{padding:6px 13px;border-radius:20px;font-size:11px;border:0.5px solid var(--bd2);color:var(--tx2);background:none;cursor:pointer}
+.img-upbtn{
+  flex:1;padding:9px 12px;
+  border:0.5px dashed var(--bd2);
+  border-radius:var(--rs);
+  font-size:12px;color:var(--tx2);
+  cursor:pointer;text-align:center;
+  background:#fff;
+}
+
+/* ─── BOTTOM SPACER ─── */
+.pb{height:20px}
 </style>
 </head>
 <body>
 <div class="app-shell">
 
+  <!-- TOP NAV -->
   <nav class="nav">
-    <span class="logo">MAYBLUE</span>
-    <div class="ntabs">
-      <button class="ntab on" onclick="showPg('styling',this)">코디</button>
-      <button class="ntab" onclick="showPg('wardrobe',this)">내 옷장</button>
-      <button class="ntab" onclick="showPg('admin',this)">관리</button>
+    <span class="logo">MAY<span>BLUE</span></span>
+    <div class="weather-pill" onclick="document.querySelector('.wdetail').classList.toggle('expanded-w')">
+      <span class="w-ico" id="wico">🌤️</span>
+      <div class="w-right">
+        <div class="w-temp" id="wtemp">—°C</div>
+        <div class="w-sub" id="wdesc">불러오는 중</div>
+      </div>
     </div>
   </nav>
 
-  <!-- STYLING -->
-  <div class="pg on" id="pg-styling">
-    <div class="wbar">
-      <div class="wleft">
-        <div class="wico" id="wico">🌤️</div>
-        <div>
-          <div class="wtemp" id="wtemp">—°C</div>
-          <div class="wdesc" id="wdesc">날씨 불러오는 중...</div>
-          <div class="wgps" id="wgps">GPS로 현재 위치 날씨를 가져와요</div>
-        </div>
-      </div>
-      <div class="wtags">
-        <span class="wtag" id="whumid">—</span>
-        <span class="wtag" id="wwind">—</span>
-      </div>
-    </div>
+  <!-- PAGES WRAPPER -->
+  <div class="pages">
 
-    <div class="big-tabs">
-      <button class="btab on" id="bt-rec" onclick="setBigTab('rec',this)">
-        <span class="bico">✦</span>메이블루 코디 추천
-      </button>
-      <button class="btab" id="bt-wd" onclick="setBigTab('wd',this)">
-        <span class="bico">👗</span>내 옷장으로
-      </button>
-    </div>
-<div class="ulbl">내 사진 올리기</div>
-          <div class="usub">피부톤 분석으로 더 정확한 컬러 추천 (선택)</div>
-          <button onclick="document.getElementById('face-input').click()" style="margin-top:8px;padding:7px 16px;border-radius:20px;border:0.5px solid var(--bd2);background:var(--bg2);color:var(--tx2);font-size:12px;cursor:pointer">사진 선택</button>
-        </div>
-        <img id="face-prev" alt="내 사진">
-      </div>
-      <div class="divider"></div>
-    </div>
+    <!-- ========== STYLING PAGE ========== -->
+    <div class="pg on" id="pg-styling">
 
-    <div id="panel-wd" style="display:none">
-      <div class="panel-inner">
-        <div style="font-size:12px;color:var(--tx2)">옷장에 등록된 옷 <strong style="color:var(--br2)" id="wd-count">0</strong>벌 기반으로 추천해드려요. 메이블루 아우터·가방·신발을 자연스럽게 곁들여요.</div>
+      <!-- Weather detail strip -->
+      <div class="wdetail">
+        <span class="wtag" id="whumid">습도 —</span>
+        <span class="wtag" id="wwind">바람 —</span>
+        <span class="wgps" id="wgps">GPS 날씨</span>
       </div>
-      <div class="divider"></div>
-    </div>
 
-    <div class="sec">
-      <div class="loc-time-row">
-        <div class="inp-wrap">
-          <span class="inp-lbl">오늘 어디 가세요?</span>
-          <input class="inp" id="loc-input" placeholder="예: 홍대, 강남, 성수동..." oninput="detectMood(this.value)">
-        </div>
-        <div class="inp-wrap">
-          <span class="inp-lbl">시간대</span>
-          <input class="inp" id="time-input" placeholder="예: 오전 10시, 저녁 7시">
-        </div>
-      </div>
-      <div class="sec-lbl">상황</div>
-      <div class="chips">
-        <button class="chip on" onclick="toggleChip(this,'오피스')">🏢 오피스</button>
-        <button class="chip" onclick="toggleChip(this,'데이트')">💫 데이트</button>
-        <button class="chip" onclick="toggleChip(this,'캐주얼 외출')">🛍 캐주얼</button>
-        <button class="chip" onclick="toggleChip(this,'파티·행사')">🥂 파티·행사</button>
-        <button class="chip" onclick="toggleChip(this,'여행')">✈️ 여행</button>
-        <button class="chip" onclick="toggleChip(this,'야외 활동')">🌿 야외</button>
-      </div>
-      <textarea class="sinput" id="extra" placeholder="추가 메모 (예: 중요한 미팅이 있어요...)"></textarea>
-    </div>
-    <div class="divider"></div>
-
-    <div class="mood-area" id="mood-area">
-      <div class="mood-l">
-        <span class="mood-ico" id="mood-ico">📍</span>
-        <div>
-          <div class="mood-nm" id="mood-nm"></div>
-          <div class="mood-ds" id="mood-ds"></div>
-        </div>
-      </div>
-      <span class="mood-badge" id="mood-badge"></span>
-    </div>
-
-    <div class="sec">
-      <div class="sec-lbl">평소 스타일 <span style="font-weight:400;color:var(--tx3)">(복수 선택)</span></div>
-      <div class="style-row">
-        <button class="schip" onclick="toggleStyle(this,'미니멀·베이직')">🤍 미니멀</button>
-        <button class="schip" onclick="toggleStyle(this,'스트릿·힙')">🧢 스트릿·힙</button>
-        <button class="schip" onclick="toggleStyle(this,'페미닌·로맨틱')">🌸 페미닌</button>
-        <button class="schip" onclick="toggleStyle(this,'오피스·시크')">💼 오피스</button>
-        <button class="schip" onclick="toggleStyle(this,'캐주얼·컴포트')">👟 캐주얼</button>
-        <button class="schip" onclick="toggleStyle(this,'빈티지·레트로')">🕶️ 빈티지</button>
-        <button class="schip" onclick="toggleStyle(this,'스포티·액티브')">🏃 스포티</button>
-      </div>
-      <div class="custom-row">
-        <input type="checkbox" class="custom-chk" id="custom-chk" onchange="toggleCustom(this)">
-        <label for="custom-chk" style="font-size:12px;color:var(--tx2);cursor:pointer;flex-shrink:0">기타 직접입력</label>
-        <input class="custom-inp" id="custom-inp" placeholder="예: 고프코어, 아카데믹..." disabled>
-      </div>
-    </div>
-    <div class="divider"></div>
-
-    <div class="cta-wrap">
-      <button class="ctabtn" id="ctabtn" onclick="getRec()">✦ 코디 추천 받기</button>
-    </div>
-
-    <div class="loading" id="loading">
-      <div class="spinner"></div>
-      <div style="font-size:13px;color:var(--tx2)" id="ltxt">AI가 분석 중이에요...</div>
-    </div>
-
-    <div class="result" id="result">
-      <div class="rhd">오늘의 추천 코디</div>
-      <div class="ocard">
-        <div class="otitle" id="otitle"></div>
-        <div class="odesc" id="odesc"></div>
-        <div class="pgrid" id="pgrid"></div>
-      </div>
-      <div class="share-row">
-        <button class="sbtn s-kako" onclick="shareKakao()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.685 1.707 5.037 4.284 6.384L5.37 20.5l4.196-2.59A11.6 11.6 0 0012 18c5.523 0 10-3.477 10-7.5S17.523 3 12 3z"/></svg>
-          카카오 공유
+      <!-- Mode tabs -->
+      <div class="mode-tabs">
+        <button class="mtab on" id="bt-rec" onclick="setBigTab('rec',this)">
+          <span class="mico">✦</span>메이블루 코디
         </button>
-        <button class="sbtn" onclick="shareInsta()">📸 인스타 저장</button>
-        <button class="sbtn" onclick="copyLink()">🔗 링크 복사</button>
+        <button class="mtab" id="bt-wd" onclick="setBigTab('wd',this)">
+          <span class="mico">👗</span>내 옷장으로
+        </button>
       </div>
-    </div>
-    <div style="height:20px"></div>
-  </div>
 
-  <!-- WARDROBE -->
-  <div class="pg" id="pg-wardrobe">
-    <div class="wd-hd">
-      <div style="font-size:14px;font-weight:500">내 옷장</div>
-      <button class="addbtn" onclick="document.getElementById('wd-up').click()">+ 옷 추가</button>
-    </div>
-    <input type="file" id="wd-up" accept="image/*" style="display:none" onchange="addWd(this)">
-    <div class="cattabs">
-      <button class="ctab on" onclick="filterWd('전체',this)">전체</button>
-      <button class="ctab" onclick="filterWd('상의',this)">상의</button>
-      <button class="ctab" onclick="filterWd('하의',this)">하의</button>
-      <button class="ctab" onclick="filterWd('아우터',this)">아우터</button>
-      <button class="ctab" onclick="filterWd('원피스',this)">원피스</button>
-      <button class="ctab" onclick="filterWd('신발',this)">신발</button>
-      <button class="ctab" onclick="filterWd('가방',this)">가방</button>
-    </div>
-    <div class="wdgrid" id="wdgrid"></div>
-    <div style="padding:0 20px 24px">
-      <button class="ctabtn" onclick="goWdRec()">✦ 내 옷으로 코디 추천 받기</button>
-    </div>
-  </div>
-
-  <!-- ADMIN -->
-  <div class="pg" id="pg-admin">
-    <div class="lock-screen" id="lock-screen">
-      <div class="lock-ico">🔒</div>
-      <div class="lock-title">관리자 전용 페이지</div>
-      <div class="lock-sub">비밀번호를 입력해주세요</div>
-      <input class="lock-inp" id="lock-inp" type="password" placeholder="비밀번호" onkeydown="if(event.key==='Enter')checkPw()">
-      <button class="lock-btn" onclick="checkPw()">확인</button>
-      <div class="lock-err" id="lock-err"></div>
-    </div>
-    <div class="admin-content" id="admin-content">
-      <div class="logout-row">
-        <button class="logout-btn" onclick="logout()">🔒 잠금</button>
+      <!-- Wardrobe mode hint -->
+      <div class="panel-hint" id="panel-wd">
+        옷장에 등록된 옷 <strong style="color:var(--br2)" id="wd-count">0</strong>벌을 기반으로 메이블루 아우터·가방·신발을 자연스럽게 곁들여 추천해드려요.
       </div>
-      <div class="admin-sec">
-        <div class="ahd">기상청 API 설정</div>
-        <div class="note-box note-blue">
-          <strong>기상청 API 발급 (3단계)</strong>
-          <div class="note-step"><div class="note-num">1</div><div style="font-size:11px;line-height:1.6"><a href="https://www.data.go.kr" target="_blank">data.go.kr</a> 접속 → 회원가입 → 로그인</div></div>
-          <div class="note-step"><div class="note-num">2</div><div style="font-size:11px;line-height:1.6">검색창에 <strong>"초단기실황조회"</strong> → 기상청_단기예보 → <strong>[활용신청]</strong> (즉시 승인)</div></div>
-          <div class="note-step"><div class="note-num">3</div><div style="font-size:11px;line-height:1.6">마이페이지 → 개발계정 → <strong>일반 인증키(Decoding)</strong> 복사 후 붙여넣기</div></div>
-        </div>
-        <label class="fl">기상청 API 인증키</label>
-        <input class="fi" id="w-key" placeholder="발급받은 서비스 키">
-        <button class="fsave" onclick="saveWeatherKey()" style="margin-bottom:16px">날씨 연결 테스트</button>
 
-        <div class="ahd">Google 스프레드시트 연동</div>
-        <div class="note-box note-green">
-          <strong>Google Sheets API 발급 (3단계)</strong>
-          <div class="note-step"><div class="note-num">1</div><div style="font-size:11px;line-height:1.6"><a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → 새 프로젝트 → API 라이브러리 → <strong>"Google Sheets API"</strong> 사용 설정</div></div>
-          <div class="note-step"><div class="note-num">2</div><div style="font-size:11px;line-height:1.6">사용자 인증 정보 → <strong>API 키 만들기</strong> → 복사</div></div>
-          <div class="note-step"><div class="note-num">3</div><div style="font-size:11px;line-height:1.6">스프레드시트 공유 → <strong>"링크 있는 사람 보기"</strong> 설정 필수</div></div>
-          <div style="margin-top:8px;font-size:11px;font-weight:500">스프레드시트 열 순서 (1행은 제목행)</div>
-          <div class="st-cols">
-            <span class="st-col">A: 제품명</span><span class="st-col">B: 카테고리</span><span class="st-col">C: 가격</span>
-            <span class="st-col">D: 카피문구</span><span class="st-col">E: 링크URL</span><span class="st-col">F: 날씨조건</span>
-            <span class="st-col">G: 이미지URL</span><span class="st-col">H: 스타일태그</span>
+      <!-- Location & Time -->
+      <div class="sec">
+        <div class="loc-time-row">
+          <div class="inp-wrap">
+            <span class="inp-lbl">오늘 어디 가세요?</span>
+            <input class="inp" id="loc-input" placeholder="홍대, 강남, 성수동..." oninput="detectMood(this.value)">
+          </div>
+          <div class="inp-wrap">
+            <span class="inp-lbl">시간대</span>
+            <input class="inp" id="time-input" placeholder="오전 10시, 저녁 7시">
           </div>
         </div>
-        <label class="fl">스프레드시트 ID</label>
-        <input class="fi" id="s-id" placeholder="URL의 /d/ 뒤 문자열">
-        <label class="fl">Google Sheets API 키</label>
-        <input class="fi" id="s-key" placeholder="AIzaSy...">
-        <button class="fsave" onclick="fetchFromSheets()">스프레드시트 연동 테스트</button>
+      </div>
 
-        <div class="ahd">제품 목록</div>
-        <div id="admin-list"></div>
-        <button class="addbtn" style="border-radius:var(--rs);padding:8px 16px;margin-top:8px" onclick="document.getElementById('addform').classList.toggle('on')">
-          + 직접 추가
-        </button>
-        <div class="addform" id="addform">
-          <div class="img-row">
-            <div class="img-thumb" id="form-thumb">🧥</div>
-            <div class="img-upbtn" onclick="document.getElementById('prod-img').click()">📤 이미지 업로드</div>
-            <input type="file" id="prod-img" accept="image/*" style="display:none" onchange="prevProdImg(this)">
+      <!-- Mood reveal -->
+      <div class="mood-strip" id="mood-area">
+        <div class="mood-l">
+          <span class="mood-ico" id="mood-ico">📍</span>
+          <div>
+            <div class="mood-nm" id="mood-nm"></div>
+            <div class="mood-ds" id="mood-ds"></div>
           </div>
-          <label class="fl">제품명</label><input class="fi" id="f-name" placeholder="에어 바람막이 재킷">
-          <div class="fr2">
-            <div><label class="fl">카테고리</label>
-              <select class="fi" id="f-cat">
-                <option>아우터</option><option>상의</option><option>하의</option>
-                <option>원피스</option><option>신발</option><option>가방</option><option>악세서리</option>
-              </select>
+        </div>
+        <span class="mood-badge" id="mood-badge"></span>
+      </div>
+
+      <!-- Situation chips -->
+      <div class="sec" style="padding-top:0">
+        <div class="sec-lbl">상황</div>
+        <div class="chips">
+          <button class="chip on" onclick="toggleChip(this,'오피스')">🏢 오피스</button>
+          <button class="chip" onclick="toggleChip(this,'데이트')">💫 데이트</button>
+          <button class="chip" onclick="toggleChip(this,'캐주얼 외출')">🛍 캐주얼</button>
+          <button class="chip" onclick="toggleChip(this,'파티·행사')">🥂 파티</button>
+          <button class="chip" onclick="toggleChip(this,'여행')">✈️ 여행</button>
+          <button class="chip" onclick="toggleChip(this,'야외 활동')">🌿 야외</button>
+        </div>
+        <textarea class="sinput" id="extra" placeholder="추가 메모 (예: 중요한 미팅이 있어요...)"></textarea>
+      </div>
+
+      <div class="divider-thick"></div>
+
+      <!-- Style preference -->
+      <div class="sec">
+        <div class="sec-lbl">스타일 취향 <span style="font-weight:400;color:var(--tx3);text-transform:none">(복수 선택)</span></div>
+        <div class="schips">
+          <button class="schip" onclick="toggleStyle(this,'미니멀·베이직')">🤍 미니멀</button>
+          <button class="schip" onclick="toggleStyle(this,'스트릿·힙')">🧢 스트릿</button>
+          <button class="schip" onclick="toggleStyle(this,'페미닌·로맨틱')">🌸 페미닌</button>
+          <button class="schip" onclick="toggleStyle(this,'오피스·시크')">💼 오피스</button>
+          <button class="schip" onclick="toggleStyle(this,'캐주얼·컴포트')">👟 캐주얼</button>
+          <button class="schip" onclick="toggleStyle(this,'빈티지·레트로')">🕶️ 빈티지</button>
+          <button class="schip" onclick="toggleStyle(this,'스포티·액티브')">🏃 스포티</button>
+        </div>
+        <div class="custom-row">
+          <input type="checkbox" class="custom-chk" id="custom-chk" onchange="toggleCustom(this)">
+          <label for="custom-chk" style="font-size:12px;color:var(--tx2);cursor:pointer;flex-shrink:0">직접 입력</label>
+          <input class="custom-inp" id="custom-inp" placeholder="예: 고프코어, 아카데믹..." disabled>
+        </div>
+      </div>
+
+      <div class="divider-thick"></div>
+
+      <!-- Face photo upload (optional) -->
+      <div class="sec" style="padding-bottom:0">
+        <div class="sec-lbl">내 사진 <span style="font-weight:400;color:var(--tx3);text-transform:none">(선택 — 피부톤 컬러 분석)</span></div>
+      </div>
+      <div class="face-sec">
+        <div class="face-left">
+          <div class="face-lbl">사진 올리기</div>
+          <div class="face-sub">얼굴 사진을 올리면 피부톤에<br>맞는 컬러를 추천해드려요</div>
+        </div>
+        <img id="face-prev" class="face-preview" alt="내 사진">
+        <button class="face-btn" onclick="document.getElementById('face-input').click()">사진 선택</button>
+        <input type="file" id="face-input" accept="image/*" style="display:none" onchange="prevFace(this)">
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-wrap">
+        <button class="ctabtn" id="ctabtn" onclick="getRec()">✦ 코디 추천 받기</button>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div class="ltxt" id="ltxt">AI가 분석 중이에요...</div>
+      </div>
+
+      <!-- Result -->
+      <div class="result" id="result">
+        <div class="rhd">오늘의 추천 코디</div>
+        <div class="ocard">
+          <div class="otitle" id="otitle"></div>
+          <div class="odesc" id="odesc"></div>
+          <div class="pgrid" id="pgrid"></div>
+        </div>
+        <div class="share-row">
+          <button class="sbtn s-kako" onclick="shareKakao()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.685 1.707 5.037 4.284 6.384L5.37 20.5l4.196-2.59A11.6 11.6 0 0012 18c5.523 0 10-3.477 10-7.5S17.523 3 12 3z"/></svg>
+            카카오 공유
+          </button>
+          <button class="sbtn" onclick="shareInsta()">📸 저장</button>
+          <button class="sbtn" onclick="copyLink()">🔗 링크</button>
+        </div>
+        <div class="pb"></div>
+      </div>
+
+    </div><!-- /pg-styling -->
+
+    <!-- ========== WARDROBE PAGE ========== -->
+    <div class="pg" id="pg-wardrobe">
+      <div class="wd-hd">
+        <div class="wd-title">내 옷장</div>
+        <button class="addbtn" onclick="document.getElementById('wd-up').click()">+ 옷 추가</button>
+      </div>
+      <input type="file" id="wd-up" accept="image/*" style="display:none" onchange="addWd(this)">
+      <div class="cattabs">
+        <button class="ctab on" onclick="filterWd('전체',this)">전체</button>
+        <button class="ctab" onclick="filterWd('상의',this)">상의</button>
+        <button class="ctab" onclick="filterWd('하의',this)">하의</button>
+        <button class="ctab" onclick="filterWd('아우터',this)">아우터</button>
+        <button class="ctab" onclick="filterWd('원피스',this)">원피스</button>
+        <button class="ctab" onclick="filterWd('신발',this)">신발</button>
+        <button class="ctab" onclick="filterWd('가방',this)">가방</button>
+      </div>
+      <div class="wdgrid" id="wdgrid"></div>
+      <div class="wd-cta">
+        <button class="ctabtn" onclick="goWdRec()">✦ 내 옷으로 코디 추천 받기</button>
+      </div>
+    </div>
+
+    <!-- ========== ADMIN PAGE ========== -->
+    <div class="pg" id="pg-admin">
+      <div class="lock-screen" id="lock-screen">
+        <div class="lock-ico">🔒</div>
+        <div class="lock-title">관리자 페이지</div>
+        <div class="lock-sub">제품·API 설정을 관리할 수 있어요.<br>비밀번호를 입력해주세요.</div>
+        <input class="lock-inp" id="lock-inp" type="password" placeholder="비밀번호" onkeydown="if(event.key==='Enter')checkPw()">
+        <button class="lock-btn" onclick="checkPw()">확인</button>
+        <div class="lock-err" id="lock-err"></div>
+      </div>
+
+      <div class="admin-content" id="admin-content">
+        <div class="logout-row">
+          <button class="logout-btn" onclick="logout()">🔒 잠금</button>
+        </div>
+
+        <div class="admin-sec">
+          <div class="ahd">기상청 API 설정</div>
+          <div class="note-box note-blue">
+            <strong>기상청 API 발급 (3단계)</strong>
+            <div class="note-step"><div class="note-num">1</div><div style="font-size:11px;line-height:1.6"><a href="https://www.data.go.kr" target="_blank">data.go.kr</a> 접속 → 회원가입 → 로그인</div></div>
+            <div class="note-step"><div class="note-num">2</div><div style="font-size:11px;line-height:1.6">검색 <strong>"초단기실황조회"</strong> → 기상청_단기예보 → <strong>[활용신청]</strong></div></div>
+            <div class="note-step"><div class="note-num">3</div><div style="font-size:11px;line-height:1.6">마이페이지 → 개발계정 → <strong>일반 인증키(Decoding)</strong> 복사</div></div>
+          </div>
+          <label class="fl">기상청 API 인증키</label>
+          <input class="fi" id="w-key" placeholder="발급받은 서비스 키">
+          <button class="fsave" onclick="saveWeatherKey()">날씨 연결 테스트</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="admin-sec">
+          <div class="ahd">Google 스프레드시트 연동</div>
+          <div class="note-box note-green">
+            <strong>Google Sheets API 발급 (3단계)</strong>
+            <div class="note-step"><div class="note-num">1</div><div style="font-size:11px;line-height:1.6"><a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> → 새 프로젝트 → <strong>"Google Sheets API"</strong> 사용 설정</div></div>
+            <div class="note-step"><div class="note-num">2</div><div style="font-size:11px;line-height:1.6">사용자 인증 정보 → <strong>API 키 만들기</strong> → 복사</div></div>
+            <div class="note-step"><div class="note-num">3</div><div style="font-size:11px;line-height:1.6">스프레드시트 공유 → <strong>"링크 있는 사람 보기"</strong> 필수</div></div>
+            <div style="margin-top:10px;font-size:11px;font-weight:600">열 순서 (1행은 제목행)</div>
+            <div class="st-cols">
+              <span class="st-col">A: 제품명</span><span class="st-col">B: 카테고리</span><span class="st-col">C: 가격</span>
+              <span class="st-col">D: 카피문구</span><span class="st-col">E: 링크URL</span><span class="st-col">F: 날씨조건</span>
+              <span class="st-col">G: 이미지URL</span><span class="st-col">H: 스타일태그</span>
             </div>
-            <div><label class="fl">가격</label><input class="fi" id="f-price" placeholder="69,000"></div>
           </div>
-          <label class="fl">카피 문구</label><input class="fi" id="f-copy" placeholder="냉방 빵빵! 가볍게 걸쳐보세요">
-          <label class="fl">제품 링크</label><input class="fi" id="f-url" placeholder="https://mayblue.kr/...">
-          <label class="fl">날씨 조건</label><input class="fi" id="f-weather" placeholder="25도 이상, 여름, 냉방">
-          <label class="fl">스타일 태그</label><input class="fi" id="f-style" placeholder="미니멀, 오피스, 캐주얼">
-          <button class="fsave" onclick="addProd()" style="margin-bottom:0">등록</button>
+          <label class="fl">스프레드시트 ID</label>
+          <input class="fi" id="s-id" placeholder="URL의 /d/ 뒤 문자열">
+          <label class="fl">Google Sheets API 키</label>
+          <input class="fi" id="s-key" placeholder="AIzaSy...">
+          <button class="fsave" onclick="fetchFromSheets()">스프레드시트 연동 테스트</button>
         </div>
-      </div>
-    </div>
-  </div>
 
-</div>
+        <div class="divider"></div>
+
+        <div class="admin-sec">
+          <div class="ahd">제품 목록</div>
+          <div id="admin-list"></div>
+          <button class="addbtn" style="border-radius:var(--rs);padding:9px 16px;margin-top:8px;width:100%;justify-content:center" onclick="document.getElementById('addform').classList.toggle('on')">
+            + 직접 추가
+          </button>
+          <div class="addform" id="addform">
+            <div class="img-row">
+              <div class="img-thumb" id="form-thumb">🧥</div>
+              <div class="img-upbtn" onclick="document.getElementById('prod-img').click()">📤 이미지 업로드</div>
+              <input type="file" id="prod-img" accept="image/*" style="display:none" onchange="prevProdImg(this)">
+            </div>
+            <label class="fl">제품명</label><input class="fi" id="f-name" placeholder="에어 바람막이 재킷">
+            <div class="fr2">
+              <div>
+                <label class="fl">카테고리</label>
+                <select class="fi" id="f-cat">
+                  <option>아우터</option><option>상의</option><option>하의</option>
+                  <option>원피스</option><option>신발</option><option>가방</option><option>악세서리</option>
+                </select>
+              </div>
+              <div><label class="fl">가격</label><input class="fi" id="f-price" placeholder="69,000"></div>
+            </div>
+            <label class="fl">카피 문구</label><input class="fi" id="f-copy" placeholder="냉방 빵빵! 가볍게 걸쳐보세요">
+            <label class="fl">제품 링크</label><input class="fi" id="f-url" placeholder="https://mayblue.kr/...">
+            <label class="fl">날씨 조건</label><input class="fi" id="f-weather" placeholder="25도 이상, 여름, 냉방">
+            <label class="fl">스타일 태그</label><input class="fi" id="f-style" placeholder="미니멀, 오피스, 캐주얼">
+            <button class="fsave" onclick="addProd()" style="margin-bottom:0">등록</button>
+          </div>
+        </div>
+        <div class="pb"></div>
+      </div>
+    </div><!-- /pg-admin -->
+
+  </div><!-- /pages -->
+
+  <!-- BOTTOM TAB BAR -->
+  <nav class="tabbar">
+    <button class="tab on" id="tab-styling" onclick="showPg('styling',this)">
+      <span class="tab-ico">✦</span>
+      <span class="tab-lbl">코디</span>
+    </button>
+    <button class="tab" id="tab-wardrobe" onclick="showPg('wardrobe',this)">
+      <span class="tab-ico">👗</span>
+      <span class="tab-lbl">내 옷장</span>
+    </button>
+    <button class="tab" id="tab-admin" onclick="showPg('admin',this)">
+      <span class="tab-ico">⚙️</span>
+      <span class="tab-lbl">관리</span>
+    </button>
+  </nav>
+
+</div><!-- /app-shell -->
 
 <script>
 const ICONS={아우터:'🧥',상의:'👚',하의:'👖',원피스:'👗',신발:'👟',가방:'👜',악세서리:'💍'};
@@ -449,60 +898,192 @@ let products=[
 let wdItems=[], selChips=['오피스'], selStyles=[], curMode='rec', nextId=7;
 let prodImgData=null, curOutfit=null, curMoodKey='', adminUnlocked=false;
 
-function showPg(pg,btn){
-  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
-  document.getElementById('pg-'+pg).classList.add('on');
-  if(btn)btn.classList.add('on');
-  if(pg==='admin'){
-    if(adminUnlocked){document.getElementById('lock-screen').style.display='none';document.getElementById('admin-content').classList.add('on');renderAdmin();}
-    else{document.getElementById('lock-screen').style.display='block';document.getElementById('admin-content').classList.remove('on');setTimeout(()=>document.getElementById('lock-inp').focus(),100);}
+/* ── NAVIGATION ── */
+function showPg(pg, btn) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('pg-' + pg).classList.add('on');
+  document.getElementById('tab-' + pg).classList.add('on');
+  if (pg === 'admin') {
+    if (adminUnlocked) {
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('admin-content').classList.add('on');
+      renderAdmin();
+    } else {
+      document.getElementById('lock-screen').style.display = 'block';
+      document.getElementById('admin-content').classList.remove('on');
+      setTimeout(() => document.getElementById('lock-inp').focus(), 100);
+    }
   }
 }
-function checkPw(){
-  const v=document.getElementById('lock-inp').value;
-  if(v===PW){adminUnlocked=true;document.getElementById('lock-screen').style.display='none';document.getElementById('admin-content').classList.add('on');document.getElementById('lock-inp').value='';document.getElementById('lock-err').textContent='';renderAdmin();}
-  else{document.getElementById('lock-err').textContent='비밀번호가 맞지 않아요.';document.getElementById('lock-inp').value='';document.getElementById('lock-inp').focus();}
-}
-function logout(){adminUnlocked=false;document.getElementById('admin-content').classList.remove('on');document.getElementById('lock-screen').style.display='block';}
 
-function setBigTab(tab,btn){
-  document.querySelectorAll('.btab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');curMode=tab;
-  
-  document.getElementById('panel-wd').style.display=tab==='wd'?'block':'none';
-  document.getElementById('wd-count').textContent=wdItems.length;
-  document.getElementById('ctabtn').textContent={rec:'✦ 코디 추천 받기',wd:'✦ 내 옷장으로 추천 받기'}[tab]||'✦ 코디 추천 받기';
+function checkPw() {
+  const v = document.getElementById('lock-inp').value;
+  if (v === PW) {
+    adminUnlocked = true;
+    document.getElementById('lock-screen').style.display = 'none';
+    document.getElementById('admin-content').classList.add('on');
+    document.getElementById('lock-inp').value = '';
+    document.getElementById('lock-err').textContent = '';
+    renderAdmin();
+  } else {
+    document.getElementById('lock-err').textContent = '비밀번호가 맞지 않아요.';
+    document.getElementById('lock-inp').value = '';
+    document.getElementById('lock-inp').focus();
+  }
 }
-function toggleChip(el,v){el.classList.toggle('on');selChips=el.classList.contains('on')?[...selChips,v]:selChips.filter(c=>c!==v);}
-function toggleStyle(el,v){el.classList.toggle('on');selStyles=el.classList.contains('on')?[...selStyles,v]:selStyles.filter(s=>s!==v);}
-function toggleCustom(chk){const i=document.getElementById('custom-inp');i.disabled=!chk.checked;if(chk.checked)i.focus();}
-function detectMood(val){
-  const v=val.trim(),area=document.getElementById('mood-area');
-  if(!v){area.classList.remove('on');curMoodKey='';return;}
-  let found='';
-  for(const k of Object.keys(MOODS)){if(v.includes(k)){found=k;break;}}
-  if(!found){for(const [a,t] of Object.entries(ALIASES)){if(v.includes(a)){found=t;break;}}}
-  if(found){curMoodKey=found;const m=MOODS[found];document.getElementById('mood-ico').textContent=m.ico;document.getElementById('mood-nm').textContent=m.nm;document.getElementById('mood-ds').textContent=m.ds;document.getElementById('mood-badge').textContent=m.badge;area.classList.add('on');}
-  else{area.classList.remove('on');curMoodKey='';}
+function logout() {
+  adminUnlocked = false;
+  document.getElementById('admin-content').classList.remove('on');
+  document.getElementById('lock-screen').style.display = 'block';
 }
-function prevFace(input){if(!input.files||!input.files[0])return;const r=new FileReader();r.onload=e=>{const img=document.getElementById('face-prev');img.src=e.target.result;img.style.display='block';document.getElementById('upbox').style.display='none';};r.readAsDataURL(input.files[0]);}
-function prevProdImg(input){if(!input.files||!input.files[0])return;const r=new FileReader();r.onload=e=>{prodImgData=e.target.result;document.getElementById('form-thumb').innerHTML=`<img src="${e.target.result}" alt="">`;};r.readAsDataURL(input.files[0]);}
 
-async function saveWeatherKey(){await fetchWeather();}
-async function fetchWeather(){
-  const key=document.getElementById('w-key')?.value?.trim();
-  if(!key){document.getElementById('wtemp').textContent='26°C';document.getElementById('wdesc').textContent='서울 · 맑음 (샘플)';document.getElementById('whumid').textContent='습도 68%';document.getElementById('wwind').textContent='바람 2.1m/s';document.getElementById('wico').textContent='⛅';document.getElementById('wgps').textContent='관리 탭 → 기상청 API 키 입력 시 GPS 실시간 날씨 연동';return;}
-  if(!navigator.geolocation){callWeatherAPI(key,60,127);return;}
-  document.getElementById('wgps').textContent='GPS 위치 확인 중...';
-  navigator.geolocation.getCurrentPosition(pos=>{const{nx,ny}=latlonToGrid(pos.coords.latitude,pos.coords.longitude);document.getElementById('wgps').textContent=`GPS (${pos.coords.latitude.toFixed(2)}, ${pos.coords.longitude.toFixed(2)})`;callWeatherAPI(key,nx,ny);},()=>callWeatherAPI(key,60,127));
+/* ── MODE TABS ── */
+function setBigTab(tab, btn) {
+  document.querySelectorAll('.mtab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  curMode = tab;
+  const hint = document.getElementById('panel-wd');
+  hint.classList.toggle('on', tab === 'wd');
+  document.getElementById('wd-count').textContent = wdItems.length;
+  document.getElementById('ctabtn').textContent = tab === 'wd' ? '✦ 내 옷장으로 추천 받기' : '✦ 코디 추천 받기';
 }
-function latlonToGrid(lat,lon){const RE=6371.00877,GRID=5,SLAT1=30,SLAT2=60,OLON=126,OLAT=38,XO=43,YO=136,D=Math.PI/180;const re=RE/GRID,s1=SLAT1*D,s2=SLAT2*D,ol=OLON*D,oa=OLAT*D;let sn=Math.log(Math.cos(s1)/Math.cos(s2))/Math.log(Math.tan(Math.PI*.25+s2*.5)/Math.tan(Math.PI*.25+s1*.5));let sf=Math.pow(Math.tan(Math.PI*.25+s1*.5),sn)*Math.cos(s1)/sn;let ro=re*sf/Math.pow(Math.tan(Math.PI*.25+oa*.5),sn);let ra=re*sf/Math.pow(Math.tan(Math.PI*.25+lat*D*.5),sn);let th=lon*D-ol;if(th>Math.PI)th-=2*Math.PI;if(th<-Math.PI)th+=2*Math.PI;th*=sn;return{nx:Math.floor(ra*Math.sin(th)+XO+.5),ny:Math.floor(ro-ra*Math.cos(th)+YO+.5)};}
-async function callWeatherAPI(key,nx,ny){try{const now=new Date(),pad=n=>String(n).padStart(2,'0');const dt=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;let tm='0500';[2,5,8,11,14,17,20,23].forEach(b=>{if(now.getHours()>b||(now.getHours()===b&&now.getMinutes()>=10))tm=pad(b)+'00';});const res=await fetch(`https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?serviceKey=${key}&pageNo=1&numOfRows=60&dataType=JSON&base_date=${dt}&base_time=${tm}&nx=${nx}&ny=${ny}`);const json=await res.json();const items=json.response?.body?.items?.item||[];const get=c=>items.find(i=>i.category===c)?.fcstValue||'—';const t=get('T1H'),reh=get('REH'),wsd=get('WSD'),sky=get('SKY');document.getElementById('wtemp').textContent=t+'°C';document.getElementById('wdesc').textContent='현재 위치 · '+({'1':'맑음','3':'구름 많음','4':'흐림'}[sky]||'—');document.getElementById('whumid').textContent='습도 '+reh+'%';document.getElementById('wwind').textContent='바람 '+parseFloat(wsd).toFixed(1)+'m/s';document.getElementById('wico').textContent={'1':'☀️','3':'⛅','4':'☁️'}[sky]||'🌤️';}catch(e){document.getElementById('wdesc').textContent='날씨 오류 — API 키 확인';}}
-async function fetchFromSheets(){const sid=document.getElementById('s-id').value.trim(),sk=document.getElementById('s-key').value.trim();if(!sid||!sk){alert('ID와 키를 모두 입력해주세요.');return;}try{const res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sid}/values/Sheet1!A2:H200?key=${sk}`);const json=await res.json();const rows=json.values||[];if(!rows.length){alert('시트가 비어있거나 접근 불가');return;}products=rows.map((r,i)=>({id:i+1,name:r[0]||'',cat:r[1]||'기타',price:r[2]||'0',copy:r[3]||'',url:r[4]||'#',weather:r[5]||'',img:r[6]||null,style:r[7]||'',icon:ICONS[r[1]]||'👔'})).filter(p=>p.name);renderAdmin();alert(`✓ ${products.length}개 제품을 불러왔어요!`);}catch(e){alert('연결 실패. ID와 API 키를 확인해주세요.');}}
 
-async function getRec(){
+/* ── CHIPS ── */
+function toggleChip(el, v) {
+  el.classList.toggle('on');
+  selChips = el.classList.contains('on') ? [...selChips, v] : selChips.filter(c => c !== v);
+}
+function toggleStyle(el, v) {
+  el.classList.toggle('on');
+  selStyles = el.classList.contains('on') ? [...selStyles, v] : selStyles.filter(s => s !== v);
+}
+function toggleCustom(chk) {
+  const i = document.getElementById('custom-inp');
+  i.disabled = !chk.checked;
+  if (chk.checked) i.focus();
+}
+
+/* ── MOOD ── */
+function detectMood(val) {
+  const v = val.trim(), area = document.getElementById('mood-area');
+  if (!v) { area.classList.remove('on'); curMoodKey = ''; return; }
+  let found = '';
+  for (const k of Object.keys(MOODS)) { if (v.includes(k)) { found = k; break; } }
+  if (!found) { for (const [a, t] of Object.entries(ALIASES)) { if (v.includes(a)) { found = t; break; } } }
+  if (found) {
+    curMoodKey = found;
+    const m = MOODS[found];
+    document.getElementById('mood-ico').textContent = m.ico;
+    document.getElementById('mood-nm').textContent = m.nm;
+    document.getElementById('mood-ds').textContent = m.ds;
+    document.getElementById('mood-badge').textContent = m.badge;
+    area.classList.add('on');
+  } else {
+    area.classList.remove('on'); curMoodKey = '';
+  }
+}
+
+/* ── FACE PHOTO ── */
+function prevFace(input) {
+  if (!input.files || !input.files[0]) return;
+  const r = new FileReader();
+  r.onload = e => {
+    const img = document.getElementById('face-prev');
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+/* ── PRODUCT IMAGE ── */
+function prevProdImg(input) {
+  if (!input.files || !input.files[0]) return;
+  const r = new FileReader();
+  r.onload = e => {
+    prodImgData = e.target.result;
+    document.getElementById('form-thumb').innerHTML = `<img src="${e.target.result}" alt="">`;
+  };
+  r.readAsDataURL(input.files[0]);
+}
+
+/* ── WEATHER ── */
+async function saveWeatherKey() { await fetchWeather(); }
+async function fetchWeather() {
+  const key = document.getElementById('w-key')?.value?.trim();
+  if (!key) {
+    document.getElementById('wtemp').textContent = '26°C';
+    document.getElementById('wdesc').textContent = '서울 · 맑음';
+    document.getElementById('whumid').textContent = '습도 68%';
+    document.getElementById('wwind').textContent = '바람 2.1m/s';
+    document.getElementById('wico').textContent = '⛅';
+    document.getElementById('wgps').textContent = '관리 탭에서 API 키 입력 시 실시간 연동';
+    return;
+  }
+  if (!navigator.geolocation) { callWeatherAPI(key, 60, 127); return; }
+  document.getElementById('wgps').textContent = 'GPS 위치 확인 중...';
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const { nx, ny } = latlonToGrid(pos.coords.latitude, pos.coords.longitude);
+      document.getElementById('wgps').textContent = `GPS (${pos.coords.latitude.toFixed(2)}, ${pos.coords.longitude.toFixed(2)})`;
+      callWeatherAPI(key, nx, ny);
+    },
+    () => callWeatherAPI(key, 60, 127)
+  );
+}
+function latlonToGrid(lat, lon) {
+  const RE=6371.00877,GRID=5,SLAT1=30,SLAT2=60,OLON=126,OLAT=38,XO=43,YO=136,D=Math.PI/180;
+  const re=RE/GRID,s1=SLAT1*D,s2=SLAT2*D,ol=OLON*D,oa=OLAT*D;
+  let sn=Math.log(Math.cos(s1)/Math.cos(s2))/Math.log(Math.tan(Math.PI*.25+s2*.5)/Math.tan(Math.PI*.25+s1*.5));
+  let sf=Math.pow(Math.tan(Math.PI*.25+s1*.5),sn)*Math.cos(s1)/sn;
+  let ro=re*sf/Math.pow(Math.tan(Math.PI*.25+oa*.5),sn);
+  let ra=re*sf/Math.pow(Math.tan(Math.PI*.25+lat*D*.5),sn);
+  let th=lon*D-ol;
+  if(th>Math.PI)th-=2*Math.PI; if(th<-Math.PI)th+=2*Math.PI; th*=sn;
+  return{nx:Math.floor(ra*Math.sin(th)+XO+.5),ny:Math.floor(ro-ra*Math.cos(th)+YO+.5)};
+}
+async function callWeatherAPI(key, nx, ny) {
+  try {
+    const now=new Date(),pad=n=>String(n).padStart(2,'0');
+    const dt=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
+    let tm='0500';
+    [2,5,8,11,14,17,20,23].forEach(b=>{if(now.getHours()>b||(now.getHours()===b&&now.getMinutes()>=10))tm=pad(b)+'00';});
+    const res=await fetch(`https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?serviceKey=${key}&pageNo=1&numOfRows=60&dataType=JSON&base_date=${dt}&base_time=${tm}&nx=${nx}&ny=${ny}`);
+    const json=await res.json();
+    const items=json.response?.body?.items?.item||[];
+    const get=c=>items.find(i=>i.category===c)?.fcstValue||'—';
+    const t=get('T1H'),reh=get('REH'),wsd=get('WSD'),sky=get('SKY');
+    document.getElementById('wtemp').textContent=t+'°C';
+    document.getElementById('wdesc').textContent='현재 위치 · '+({'1':'맑음','3':'구름 많음','4':'흐림'}[sky]||'—');
+    document.getElementById('whumid').textContent='습도 '+reh+'%';
+    document.getElementById('wwind').textContent='바람 '+parseFloat(wsd).toFixed(1)+'m/s';
+    document.getElementById('wico').textContent={'1':'☀️','3':'⛅','4':'☁️'}[sky]||'🌤️';
+  } catch(e) {
+    document.getElementById('wdesc').textContent='날씨 오류 — API 키 확인';
+  }
+}
+
+/* ── GOOGLE SHEETS ── */
+async function fetchFromSheets() {
+  const sid=document.getElementById('s-id').value.trim(),sk=document.getElementById('s-key').value.trim();
+  if(!sid||!sk){alert('ID와 키를 모두 입력해주세요.');return;}
+  try {
+    const res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sid}/values/Sheet1!A2:H200?key=${sk}`);
+    const json=await res.json();
+    const rows=json.values||[];
+    if(!rows.length){alert('시트가 비어있거나 접근 불가');return;}
+    products=rows.map((r,i)=>({id:i+1,name:r[0]||'',cat:r[1]||'기타',price:r[2]||'0',copy:r[3]||'',url:r[4]||'#',weather:r[5]||'',img:r[6]||null,style:r[7]||'',icon:ICONS[r[1]]||'👔'})).filter(p=>p.name);
+    renderAdmin();
+    alert(`✓ ${products.length}개 제품을 불러왔어요!`);
+  } catch(e) {
+    alert('연결 실패. ID와 API 키를 확인해주세요.');
+  }
+}
+
+/* ── AI RECOMMENDATION ── */
+async function getRec() {
   const btn=document.getElementById('ctabtn'),loading=document.getElementById('loading'),result=document.getElementById('result');
-  loading.classList.add('on');result.classList.remove('on');btn.disabled=true;
+  loading.classList.add('on'); result.classList.remove('on'); btn.disabled=true;
   const sit=selChips.join(', ')||'외출',loc=document.getElementById('loc-input').value.trim(),tv=document.getElementById('time-input').value.trim(),note=document.getElementById('extra').value;
   const custom=document.getElementById('custom-chk').checked?document.getElementById('custom-inp').value.trim():'';
   const styles=[...selStyles,...(custom?[custom]:[])].join(', ')||'미정';
@@ -510,40 +1091,140 @@ async function getRec(){
   const wt=document.getElementById('wtemp').textContent,wd=document.getElementById('wdesc').textContent,wh=document.getElementById('whumid').textContent;
   const wdMode=curMode==='wd'&&wdItems.length>0;
   const msgs=['날씨와 장소 무드 분석 중...','스타일 취향 매칭 중...','최적의 코디 고르는 중...'];
-  let mi=0;const ltxt=document.getElementById('ltxt');const iv=setInterval(()=>{ltxt.textContent=msgs[mi%msgs.length];mi++;},1200);
+  let mi=0;
+  const ltxt=document.getElementById('ltxt');
+  const iv=setInterval(()=>{ltxt.textContent=msgs[mi%msgs.length];mi++;},1200);
   const pl=products.map(p=>`[id:${p.id}]${p.name}(${p.cat},₩${p.price}) 카피:"${p.copy}" 조건:${p.weather} 스타일:${p.style}`).join('\n');
   const wdl=wdMode?wdItems.map((w,i)=>`옷${i+1}:${w.name}`).join(', '):'';
-  try{
-    const resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:"메이블루 패션 AI 스타일리스트. 날씨·시간대·장소무드·스타일취향 반영. 내옷장모드시 메이블루 아우터·악세서리·가방·신발 추천. JSON만반환.",messages:[{role:"user",content:`날씨:${wt} ${wd} ${wh}\n시간대:${tv||'미입력'}\n장소:${loc||'미입력'}${mood?' ('+mood.nm+' — '+mood.ds+')':''}\n상황:${sit}\n스타일:${styles}\n${note?'메모:'+note:''}\n${wdMode?'[내옷장] '+wdl:''}\n\n제품:\n${pl}\n\nJSON:{"outfit_title":"(12자이내)","outfit_desc":"(장소무드·시간대반영,70자이내)","recommended_ids":[3~4개숫자],"share_text":"카카오공유문구2줄","mood_comment":"${mood?'장소무드한마디':''}"}만반환`}]})});
+  try {
+    const resp=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        system:"메이블루 패션 AI 스타일리스트. 날씨·시간대·장소무드·스타일취향 반영. 내옷장모드시 메이블루 아우터·악세서리·가방·신발 추천. JSON만반환.",
+        messages:[{role:"user",content:`날씨:${wt} ${wd} ${wh}\n시간대:${tv||'미입력'}\n장소:${loc||'미입력'}${mood?' ('+mood.nm+' — '+mood.ds+')':''}\n상황:${sit}\n스타일:${styles}\n${note?'메모:'+note:''}\n${wdMode?'[내옷장] '+wdl:''}\n\n제품:\n${pl}\n\nJSON:{"outfit_title":"(12자이내)","outfit_desc":"(장소무드·시간대반영,70자이내)","recommended_ids":[3~4개숫자],"share_text":"카카오공유문구2줄","mood_comment":"${mood?'장소무드한마디':''}"}만반환`}]
+      })
+    });
     const data=await resp.json();
     const raw=data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim();
-    curOutfit=JSON.parse(raw);renderResult(curOutfit);
-  }catch(e){
+    curOutfit=JSON.parse(raw);
+    renderResult(curOutfit);
+  } catch(e) {
     const fb={outfit_title:sit+' 코디',outfit_desc:(mood?mood.nm+' 무드에 어울리는 ':'')+'메이블루 스타일이에요.',recommended_ids:[1,3,5,6],share_text:'오늘의 메이블루 코디\n'+(loc||'스타일')+' 무드로 완성!'};
-    curOutfit=fb;renderResult(fb);
+    curOutfit=fb; renderResult(fb);
   }
-  clearInterval(iv);loading.classList.remove('on');result.classList.add('on');btn.disabled=false;
-  btn.textContent={rec:'✦ 다시 추천 받기',wd:'✦ 내 옷장으로 다시 받기'}[curMode]||'✦ 다시 추천 받기';
+  clearInterval(iv);
+  loading.classList.remove('on');
+  result.classList.add('on');
+  btn.disabled=false;
+  btn.textContent=curMode==='wd'?'✦ 내 옷장으로 다시 받기':'✦ 다시 추천 받기';
+  // Scroll to result
+  document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
 }
-function renderResult(p){
+
+function renderResult(p) {
   document.getElementById('otitle').textContent=p.outfit_title||'';
   document.getElementById('odesc').textContent=(p.mood_comment?p.mood_comment+'\n':'')+(p.outfit_desc||'');
-  const grid=document.getElementById('pgrid');grid.innerHTML='';
-  (p.recommended_ids||[1,2,3,4]).forEach(id=>{const pr=products.find(x=>x.id===id)||products[0];if(!pr)return;grid.innerHTML+=`<div class="pcard" onclick="openProd('${pr.url}','${pr.name}')"><div class="pimg">${pr.img?`<img src="${pr.img}" alt="${pr.name}">`:(pr.icon||'👔')}</div><div class="pbody"><span class="pbadge">${pr.cat}</span><div class="pname">${pr.name}</div><div class="pcopy">${pr.copy}</div><div class="pfoot"><span class="pprice">₩${pr.price}</span><span class="plink">→ 구매</span></div></div></div>`;});
+  const grid=document.getElementById('pgrid'); grid.innerHTML='';
+  (p.recommended_ids||[1,2,3,4]).forEach(id=>{
+    const pr=products.find(x=>x.id===id)||products[0];
+    if(!pr)return;
+    grid.innerHTML+=`<div class="pcard" onclick="openProd('${pr.url}','${pr.name}')">
+      <div class="pimg">${pr.img?`<img src="${pr.img}" alt="${pr.name}">`:(pr.icon||'👔')}</div>
+      <div class="pbody">
+        <span class="pbadge">${pr.cat}</span>
+        <div class="pname">${pr.name}</div>
+        <div class="pcopy">${pr.copy}</div>
+        <div class="pfoot"><span class="pprice">₩${pr.price}</span><span class="plink">→ 구매</span></div>
+      </div>
+    </div>`;
+  });
 }
-function openProd(url,name){if(url==='#')alert(`"${name}"\n관리 탭에서 링크를 등록해주세요!`);else window.open(url,'_blank');}
-function shareKakao(){if(!curOutfit){alert('먼저 코디 추천을 받아주세요!');return;}if(window.Kakao?.isInitialized()){window.Kakao.Share.sendDefault({objectType:'text',text:curOutfit.share_text,link:{mobileWebUrl:location.href,webUrl:location.href}});}else{alert(`카카오 공유 미리보기:\n\n${curOutfit.share_text}`);}}
-function shareInsta(){if(!curOutfit){alert('먼저 코디 추천을 받아주세요!');return;}alert('인스타그램 공유\n\n실제 배포 시 html2canvas로 코디 카드 이미지를 저장해요.');}
-function copyLink(){navigator.clipboard?.writeText(location.href).then(()=>alert('링크가 복사됐어요!')).catch(()=>prompt('링크를 복사해주세요:',location.href));}
-function addWd(input){if(!input.files||!input.files[0])return;const r=new FileReader();r.onload=e=>{wdItems.push({src:e.target.result,name:input.files[0].name.replace(/\.[^.]+$/,'').slice(0,10),cat:'상의'});renderWd();document.getElementById('wd-count').textContent=wdItems.length;};r.readAsDataURL(input.files[0]);}
-function renderWd(filter='전체'){const g=document.getElementById('wdgrid');const items=filter==='전체'?wdItems:wdItems.filter(w=>w.cat===filter);g.innerHTML=`<div class="wdi add" onclick="document.getElementById('wd-up').click()" style="font-size:22px;color:var(--tx3)">+<br><span class="wdlbl">추가</span></div>`;items.forEach(w=>{g.innerHTML+=`<div class="wdi"><img src="${w.src}" alt="${w.name}"><div class="iov"><div class="inm">${w.name}</div></div></div>`;});}
-function filterWd(cat,btn){document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');renderWd(cat);}
-function goWdRec(){showPg('styling',document.querySelectorAll('.ntab')[0]);setBigTab('wd',document.getElementById('bt-wd'));getRec();}
-function renderAdmin(){document.getElementById('admin-list').innerHTML=products.map(p=>`<div class="pli"><div class="pli-img">${p.img?`<img src="${p.img}" alt="${p.name}">`:(p.icon||'👔')}</div><div class="pli-info"><div class="pli-name">${p.name}</div><div class="pli-meta">${p.cat} · ₩${p.price}</div></div><button class="actbtn" onclick="delProd(${p.id})">🗑</button></div>`).join('');}
-function addProd(){const name=document.getElementById('f-name').value.trim();if(!name){alert('제품명을 입력해주세요');return;}const cat=document.getElementById('f-cat').value;products.push({id:nextId++,name,cat,price:document.getElementById('f-price').value.trim()||'0',copy:document.getElementById('f-copy').value.trim()||name,url:document.getElementById('f-url').value.trim()||'#',weather:document.getElementById('f-weather').value.trim(),style:document.getElementById('f-style').value.trim(),icon:ICONS[cat]||'👔',img:prodImgData||null});prodImgData=null;document.getElementById('form-thumb').innerHTML='🧥';['f-name','f-price','f-copy','f-url','f-weather','f-style'].forEach(id=>document.getElementById(id).value='');document.getElementById('addform').classList.remove('on');renderAdmin();}
-function delProd(id){if(confirm('삭제할까요?')){products=products.filter(p=>p.id!==id);renderAdmin();}}
+function openProd(url, name) {
+  if(url==='#') alert(`"${name}"\n관리 탭에서 링크를 등록해주세요!`);
+  else window.open(url,'_blank');
+}
 
-renderWd();fetchWeather();
+/* ── SHARE ── */
+function shareKakao(){
+  if(!curOutfit){alert('먼저 코디 추천을 받아주세요!');return;}
+  if(window.Kakao?.isInitialized()){
+    window.Kakao.Share.sendDefault({objectType:'text',text:curOutfit.share_text,link:{mobileWebUrl:location.href,webUrl:location.href}});
+  } else {
+    alert(`카카오 공유 미리보기:\n\n${curOutfit.share_text}`);
+  }
+}
+function shareInsta(){
+  if(!curOutfit){alert('먼저 코디 추천을 받아주세요!');return;}
+  alert('인스타그램 공유\n\n실제 배포 시 html2canvas로 코디 카드 이미지를 저장해요.');
+}
+function copyLink(){
+  navigator.clipboard?.writeText(location.href).then(()=>alert('링크가 복사됐어요!')).catch(()=>prompt('링크를 복사해주세요:',location.href));
+}
+
+/* ── WARDROBE ── */
+function addWd(input){
+  if(!input.files||!input.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{
+    wdItems.push({src:e.target.result,name:input.files[0].name.replace(/\.[^.]+$/,'').slice(0,10),cat:'상의'});
+    renderWd();
+    document.getElementById('wd-count').textContent=wdItems.length;
+  };
+  r.readAsDataURL(input.files[0]);
+}
+function renderWd(filter='전체'){
+  const g=document.getElementById('wdgrid');
+  const items=filter==='전체'?wdItems:wdItems.filter(w=>w.cat===filter);
+  if(items.length===0 && filter==='전체'){
+    g.innerHTML=`<div class="wdi add" onclick="document.getElementById('wd-up').click()">+<br><span class="wdlbl">추가</span></div>`;
+    return;
+  }
+  g.innerHTML=`<div class="wdi add" onclick="document.getElementById('wd-up').click()">+<br><span class="wdlbl">추가</span></div>`;
+  items.forEach(w=>{
+    g.innerHTML+=`<div class="wdi"><img src="${w.src}" alt="${w.name}"><div class="iov"><div class="inm">${w.name}</div></div></div>`;
+  });
+}
+function filterWd(cat,btn){
+  document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('on'));
+  btn.classList.add('on');
+  renderWd(cat);
+}
+function goWdRec(){
+  showPg('styling',document.getElementById('tab-styling'));
+  setBigTab('wd',document.getElementById('bt-wd'));
+  getRec();
+}
+
+/* ── ADMIN ── */
+function renderAdmin(){
+  document.getElementById('admin-list').innerHTML=products.map(p=>`
+    <div class="pli">
+      <div class="pli-img">${p.img?`<img src="${p.img}" alt="${p.name}">`:(p.icon||'👔')}</div>
+      <div class="pli-info"><div class="pli-name">${p.name}</div><div class="pli-meta">${p.cat} · ₩${p.price}</div></div>
+      <button class="actbtn" onclick="delProd(${p.id})">🗑</button>
+    </div>`).join('');
+}
+function addProd(){
+  const name=document.getElementById('f-name').value.trim();
+  if(!name){alert('제품명을 입력해주세요');return;}
+  const cat=document.getElementById('f-cat').value;
+  products.push({id:nextId++,name,cat,price:document.getElementById('f-price').value.trim()||'0',copy:document.getElementById('f-copy').value.trim()||name,url:document.getElementById('f-url').value.trim()||'#',weather:document.getElementById('f-weather').value.trim(),style:document.getElementById('f-style').value.trim(),icon:ICONS[cat]||'👔',img:prodImgData||null});
+  prodImgData=null;
+  document.getElementById('form-thumb').innerHTML='🧥';
+  ['f-name','f-price','f-copy','f-url','f-weather','f-style'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('addform').classList.remove('on');
+  renderAdmin();
+}
+function delProd(id){
+  if(confirm('삭제할까요?')){products=products.filter(p=>p.id!==id);renderAdmin();}
+}
+
+/* ── INIT ── */
+renderWd();
+fetchWeather();
 </script>
 </body>
 </html>
